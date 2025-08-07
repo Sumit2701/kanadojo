@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import N5Kanji from '@/static/kanji/N5';
 import N4Kanji from '@/static/kanji/N4';
@@ -67,6 +67,27 @@ const Subgroup = () => {
   const [collapsedRows, setCollapsedRows] = useState<number[]>([]);
 
   const numColumns = useGridColumns();
+
+  // Add keyboard shortcut to collapse all rows
+  const collapseAll = useCallback(() => {
+    const totalRows = Math.ceil(kanjiSetsTemp.length / numColumns);
+    const allRowIndices = Array.from({ length: totalRows }, (_, i) => i);
+    setCollapsedRows(allRowIndices);
+    playClick();
+  }, [kanjiSetsTemp.length, numColumns, playClick]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl + Shift + C to collapse all
+      if (event.key.toLocaleLowerCase() === 'c') {
+        event.preventDefault();
+        collapseAll();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [collapseAll]);
 
   return (
     <div className='flex flex-col w-full gap-4'>

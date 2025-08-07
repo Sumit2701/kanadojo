@@ -1,7 +1,7 @@
 'use client';
 import clsx from 'clsx';
 import { chunkArray } from '@/lib/helperFunctions';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { cardBorderStyles } from '@/static/styles';
 import useGridColumns from '@/lib/hooks/useGridColumns';
 import { useClick } from '@/lib/hooks/useAudio';
@@ -72,6 +72,26 @@ const WordClass = () => {
   const [collapsedRows, setCollapsedRows] = useState<number[]>([]);
 
   const numColumns = useGridColumns();
+
+  // Add keyboard shortcut to collapse all rows
+  const collapseAll = useCallback(() => {
+    const totalRows = Math.ceil(vocabSetsTemp.length / numColumns);
+    const allRowIndices = Array.from({ length: totalRows }, (_, i) => i);
+    setCollapsedRows(allRowIndices);
+    playClick();
+  }, [vocabSetsTemp.length, numColumns, playClick]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLocaleLowerCase() === 'c') {
+        event.preventDefault();
+        collapseAll();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [collapseAll]);
 
   return (
     <div className='flex flex-col w-full gap-4'>
