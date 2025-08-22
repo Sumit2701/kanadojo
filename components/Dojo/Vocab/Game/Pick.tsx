@@ -68,6 +68,8 @@ const Pick = ({
     []
   );
 
+  const [hasClicked, setHasClicked] = useState(false);
+
   useEffect(() => {
     setShuffledMeanings(
       [correctMeaning, ...randomIncorrectMeanings].sort(
@@ -76,28 +78,51 @@ const Pick = ({
     );
   }, [correctWord]);
 
+  // Reset blur when correctWord changes (new question)
+  useEffect(() => {
+    setHasClicked(false);
+  }, [correctWord]);
+
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
       const index = pickGameKeyMappings[event.code];
       if (index !== undefined && index < shuffledMeanings.length) {
         buttonRefs.current[index]?.click();
       }
     };
 
+    const handleClick = () => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [hasClicked]);
 
   useEffect(() => {
     if (isHidden) speedStopwatch.pause();
   }, [isHidden]);
 
   const handleOptionClick = (meaning: string) => {
+    if (!hasClicked) {
+      setHasClicked(true);
+      speedStopwatch.start();
+    }
+
     if (meaning === correctMeaning) {
       speedStopwatch.pause();
       addCorrectAnswerTime(speedStopwatch.totalMilliseconds / 1000);
@@ -156,7 +181,7 @@ const Pick = ({
         gameMode="pick"
       />
       <p
-        className="text-6xl md:text-9xl text-center"
+        className="text-6xl text-center md:text-9xl"
         lang="ja"
       >
         {correctWord}
@@ -164,7 +189,8 @@ const Pick = ({
       <div
         className={clsx(
           'flex flex-col w-full gap-6 md:gap-0 md:justify-evenly',
-          'md:flex-row'
+          'md:flex-row',
+          !hasClicked && 'blur-sm'
         )}
       >
         {shuffledMeanings.map((meaning, i) => (

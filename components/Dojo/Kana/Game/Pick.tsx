@@ -68,6 +68,8 @@ const Pick = ({ isHidden }: { isHidden: boolean }) => {
     []
   );
 
+  const [hasClicked, setHasClicked] = useState(false);
+
   useEffect(() => {
     setShuffledVariants(
       [correctRomajiChar, ...randomIncorrectRomaji].sort(
@@ -76,28 +78,51 @@ const Pick = ({ isHidden }: { isHidden: boolean }) => {
     );
   }, [correctKanaChar]);
 
+  // Reset blur when correctKanaChar changes (new question)
+  useEffect(() => {
+    setHasClicked(false);
+  }, [correctKanaChar]);
+
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
       const index = pickGameKeyMappings[event.code];
       if (index !== undefined && index < shuffledVariants.length) {
         buttonRefs.current[index]?.click();
       }
     };
 
+    const handleClick = () => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [hasClicked]);
 
   useEffect(() => {
     if (isHidden) speedStopwatch.pause();
   }, [isHidden]);
 
   const handleOptionClick = (romajiChar: string) => {
+    if (!hasClicked) {
+      setHasClicked(true);
+      speedStopwatch.start();
+    }
+
     if (romajiChar === correctRomajiChar) {
       speedStopwatch.pause();
       addCorrectAnswerTime(speedStopwatch.totalMilliseconds / 1000);
@@ -153,8 +178,11 @@ const Pick = ({ isHidden }: { isHidden: boolean }) => {
         feedback={feedback}
         gameMode="pick"
       />
-      <p className="text-8xl sm:text-9xl font-medium">{correctKanaChar}</p>
-      <div className="flex flex-row w-full gap-5 sm:gap-0 sm:justify-evenly">
+      <p className="font-medium text-8xl sm:text-9xl">{correctKanaChar}</p>
+      <div className={clsx(
+        'flex flex-row w-full gap-5 sm:gap-0 sm:justify-evenly',
+        !hasClicked && 'blur-sm'
+      )}>
         {shuffledVariants.map((romajiChar, i) => (
           <button
             ref={elem => {

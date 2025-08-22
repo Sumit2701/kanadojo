@@ -68,6 +68,8 @@ const Pick = ({
     []
   );
 
+  const [hasClicked, setHasClicked] = useState(false);
+
   useEffect(() => {
     setShuffledMeanings(
       [correctMeaning, ...randomIncorrectMeanings].sort(
@@ -76,28 +78,51 @@ const Pick = ({
     );
   }, [correctKanjiChar]);
 
+  // Reset blur when correctKanjiChar changes (new question)
+  useEffect(() => {
+    setHasClicked(false);
+  }, [correctKanjiChar]);
+
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
       const index = pickGameKeyMappings[event.code];
       if (index !== undefined && index < shuffledMeanings.length) {
         buttonRefs.current[index]?.click();
       }
     };
 
+    const handleClick = () => {
+      if (!hasClicked) {
+        setHasClicked(true);
+        speedStopwatch.start();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
     };
-  }, []);
+  }, [hasClicked]);
 
   useEffect(() => {
     if (isHidden) speedStopwatch.pause();
   }, [isHidden]);
 
   const handleOptionClick = (meaning: string) => {
+    if (!hasClicked) {
+      setHasClicked(true);
+      speedStopwatch.start();
+    }
+
     if (meaning === correctMeaning) {
       speedStopwatch.pause();
       addCorrectAnswerTime(speedStopwatch.totalMilliseconds / 1000);
@@ -168,7 +193,8 @@ const Pick = ({
         className={clsx(
           'flex w-full gap-5 sm:gap-0 sm:justify-evenly',
           'flex-col',
-          'sm:flex-row'
+          'sm:flex-row',
+          !hasClicked && 'blur-sm'
         )}
       >
         {shuffledMeanings.map((meaning, i) => (
