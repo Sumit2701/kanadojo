@@ -181,7 +181,7 @@ const Pick = ({ isHidden }: { isHidden: boolean }) => {
       <p className="font-medium text-8xl sm:text-9xl">{correctKanaChar}</p>
       <div className={clsx(
         'flex flex-row w-full gap-5 sm:gap-0 sm:justify-evenly',
-        !hasClicked && 'blur-sm'
+        !hasClicked && 'blur-tablet-compatible'
       )}>
         {shuffledVariants.map((romajiChar, i) => (
           <button

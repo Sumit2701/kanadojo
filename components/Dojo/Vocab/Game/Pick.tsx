@@ -190,7 +190,7 @@ const Pick = ({
         className={clsx(
           'flex flex-col w-full gap-6 md:gap-0 md:justify-evenly',
           'md:flex-row',
-          !hasClicked && 'blur-sm'
+          !hasClicked && 'blur-tablet-compatible'
         )}
       >
         {shuffledMeanings.map((meaning, i) => (

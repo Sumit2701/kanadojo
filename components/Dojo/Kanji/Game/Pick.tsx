@@ -194,7 +194,7 @@ const Pick = ({
           'flex w-full gap-5 sm:gap-0 sm:justify-evenly',
           'flex-col',
           'sm:flex-row',
-          !hasClicked && 'blur-sm'
+          !hasClicked && 'blur-tablet-compatible'
         )}
       >
         {shuffledMeanings.map((meaning, i) => (

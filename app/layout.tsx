@@ -11,8 +11,6 @@ const googleVerificationToken = process.env.GOOGLE_VERIFICATION_TOKEN || '';
 const msVerificationToken = process.env.MS_VERIFICATION_TOKEN || '';
 
 export const metadata: Metadata = {
-  viewport:
-    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
   title: 'KanaDojo',
   description:
     'KanaDojo is a fun, minimalist, aesthetic platform for learning and practicing Japanese online.',
@@ -31,6 +29,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
   },
 };
+
+export const viewport = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
 
 // Move analytics condition to a constant to avoid repeated evaluation
 const isAnalyticsEnabled =

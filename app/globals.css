@@ -2,6 +2,24 @@
 @import 'tw-animate-css';
 @tailwind utilities;
 
+/* Custom blur effect for better tablet compatibility */
+.blur-tablet-compatible {
+  filter: blur(10px);
+  /* Fallback for tablets and older browsers */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Tablet-specific fallback using opacity when blur fails */
+@media (max-width: 1024px) and (orientation: portrait),
+       (max-width: 768px) and (orientation: landscape) {
+  .blur-tablet-compatible {
+    filter: blur(2px) opacity(0.6);
+    backdrop-filter: blur(2px) opacity(0.6);
+    -webkit-backdrop-filter: blur(2px) opacity(0.6);
+  }
+}
+
 @theme {
   --breakpoint-xs: 30rem;
   --breakpoint-3xl: 110rem;
